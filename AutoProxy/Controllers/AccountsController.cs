@@ -25,7 +25,18 @@ namespace AutoProxy.Controllers
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery] string filter)
         {
-            return Ok();
+            List<string> filters = new List<string>();
+            if(filter != null)
+            {
+                filters = new List<string>();
+                var filterParts = filter.Split('+');
+                foreach (var f in filterParts)
+                {
+                    filters.Add(f);   
+                }
+            }
+            var result = await _atService.Query<Account>(filters.ToArray());
+            return Ok(result);
         }
 
         // GET: api/Accounts/5
