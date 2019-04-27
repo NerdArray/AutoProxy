@@ -27,8 +27,7 @@ namespace AutoProxy.Services
         private readonly IConfiguration _config;
         private readonly ILogger<AutotaskService> _logger;
 
-        private const string BASE_ASMX = 
-            "https://webservices5.autotask.net/atservices/1.6/atws.asmx";
+        private readonly string _serviceUrl;
 
         private readonly HttpClient _client;
 
@@ -45,8 +44,12 @@ namespace AutoProxy.Services
             _logger = logger;
 
             var baseUri = new Uri(_config["AutotaskBaseUrl"]);
+
+            // Set HttpClient connections to timeout after 1m.
             var sp = ServicePointManager.FindServicePoint(baseUri);
             sp.ConnectionLeaseTimeout = 60000; // 1 minute
+
+            _serviceUrl = baseUri + "/atservices/1.6/atws.asmx";
         }
 
         public async Task<QueryResult<T>> Query<T>(IEnumerable<string> conditions) where T : Entity
@@ -162,7 +165,7 @@ namespace AutoProxy.Services
             _client.DefaultRequestHeaders.Clear();
             _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/xml"));
 
-            var request = new HttpRequestMessage(HttpMethod.Post, BASE_ASMX);
+            var request = new HttpRequestMessage(HttpMethod.Post, _serviceUrl);
             request.Content = new StringContent(xml, Encoding.UTF8, "text/xml");
             request.Content.Headers.Clear();
             request.Content.Headers.ContentType = new MediaTypeHeaderValue("text/xml");

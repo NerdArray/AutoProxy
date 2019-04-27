@@ -4,12 +4,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace AutoProxy.Controllers
 {
     [Route("[controller]")]
     [ApiController]
+    [Produces("application/json")]
     public class AccountsController : ControllerBase
     {
         private readonly AutotaskService _atService;
@@ -21,34 +23,29 @@ namespace AutoProxy.Controllers
 
         // GET: api/Accounts
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<IActionResult> Get([FromQuery] string filter)
         {
-            return new string[] { "value1", "value2" };
+            return Ok();
         }
 
         // GET: api/Accounts/5
         [HttpGet("{id}", Name = "Get")]
-        public async Task<QueryResult<Account>> Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
             var result = await _atService.Query<Account>(new string[] { "id,equals," + id });
-            return result;
+            if (result == null) return BadRequest();
+            return Ok(result);
         }
 
         // POST: api/Accounts
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task Post([FromBody] string value)
         {
         }
 
         // PUT: api/Accounts/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task Put(int id, [FromBody] string value)
         {
         }
     }
