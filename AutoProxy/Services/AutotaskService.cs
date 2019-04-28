@@ -63,11 +63,24 @@ namespace AutoProxy.Services
             {
                 foreach (var c in conditions)
                 {
-                    var args = c.Split(',');
-                    if (args.Length == 3)
+                    var args = c.Split(' ');
+
+                    // invalid filter param
+                    if (args.Length < 3) return null;
+
+                    // spaces in value detected.
+                    if (args.Length > 3)
                     {
-                        sb.Append("<condition><field>" + args[0] + "<expression op='" + args[1] + "'>" + args[2] + "</expression></field></condition>");
+                        string value = "";
+                        for (int i = 2; i < args.Length; i++)
+                        {
+                            value += args[i] + " ";
+                        }
+                        value.TrimEnd();
+                        args = new string[] { args[0], args[1], value };
                     }
+
+                    sb.Append("<condition><field>" + args[0] + "<expression op='" + args[1] + "'>" + args[2] + "</expression></field></condition>");
                 }
             }
 

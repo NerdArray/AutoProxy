@@ -12,7 +12,7 @@ namespace AutoProxy.Controllers
     [Route("[controller]")]
     [ApiController]
     [Produces("application/json")]
-    public class AccountsController : ControllerBase
+    public class AccountsController : ApiControllerBase
     {
         private readonly AutotaskService _atService;
 
@@ -23,19 +23,10 @@ namespace AutoProxy.Controllers
 
         // GET: api/Accounts
         [HttpGet]
-        public async Task<IActionResult> Get([FromQuery] string filter)
+        public async Task<IActionResult> Get(
+            [FromQuery] string filter)
         {
-            List<string> filters = new List<string>();
-            if(filter != null)
-            {
-                filters = new List<string>();
-                var filterParts = filter.Split('+');
-                foreach (var f in filterParts)
-                {
-                    filters.Add(f);   
-                }
-            }
-            var result = await _atService.Query<Account>(filters.ToArray());
+            var result = await _atService.Query<Account>(ParseFilters(filter));
             return Ok(result);
         }
 
@@ -43,7 +34,7 @@ namespace AutoProxy.Controllers
         [HttpGet("{id}", Name = "Get")]
         public async Task<IActionResult> Get(int id)
         {
-            var result = await _atService.Query<Account>(new string[] { "id,equals," + id });
+            var result = await _atService.Query<Account>(ParseFilters("id equals " + id));
             if (result == null) return BadRequest();
             return Ok(result);
         }
