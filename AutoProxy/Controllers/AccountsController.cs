@@ -3,8 +3,6 @@ using AutoProxy.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace AutoProxy.Controllers
@@ -24,9 +22,12 @@ namespace AutoProxy.Controllers
         // GET: api/Accounts
         [HttpGet]
         public async Task<IActionResult> Get(
-            [FromQuery] string filter)
+            [FromQuery] string filter,
+            [FromQuery] int? offset)
         {
-            var result = await _atService.Query<Account>(ParseFilters(filter));
+            //if (filter == null) return BadRequest();
+            //if (offset == null) offset = 0;
+            var result = await _atService.Query<Account>(ParseFilters(filter), offset);
             return Ok(result);
         }
 
@@ -34,7 +35,7 @@ namespace AutoProxy.Controllers
         [HttpGet("{id}", Name = "Get")]
         public async Task<IActionResult> Get(int id)
         {
-            var result = await _atService.Query<Account>(ParseFilters("id equals " + id));
+            var result = await _atService.Query<Account>(ParseFilters("id equals " + id), null);
             if (result == null) return BadRequest();
             return Ok(result);
         }

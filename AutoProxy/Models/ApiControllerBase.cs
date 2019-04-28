@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AutoProxy.Models
 {
@@ -13,13 +14,8 @@ namespace AutoProxy.Models
         {
             if (filters != null)
             {
-                var conditions = new List<string>();
-                var filterParts = filters.Split(',');
-                foreach (var f in filterParts)
-                {
-                    conditions.Add(f);
-                }
-                return conditions.ToArray();
+                var conditions = filters.Split("+").Select(f => f).ToList();
+                return conditions;
             }
             return null;
         }

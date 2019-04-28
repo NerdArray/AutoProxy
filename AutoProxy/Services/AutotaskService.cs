@@ -52,11 +52,19 @@ namespace AutoProxy.Services
             _serviceUrl = baseUri + "/atservices/1.6/atws.asmx";
         }
 
-        public async Task<QueryResult<T>> Query<T>(IEnumerable<string> conditions) where T : Entity
+        public async Task<QueryResult<T>> Query<T>(IEnumerable<string> conditions, int? offset) where T : Entity
         {
             // build a queryxml query... 
             StringBuilder sb = new StringBuilder();
             sb.Append("<queryxml><entity>" + typeof(T).Name + "</entity><query>");
+            if (!offset.HasValue)
+            {
+                sb.Append("<condition><field>id<expression op='GreaterThanOrEquals'>0</expression></field></condition>");
+            }
+            else
+            {
+                sb.Append("<condition><field>id<expression op='GreaterThanOrEquals'>" + offset + "</expression></field></condition>");
+            }
 
             // add conditions...
             if (conditions != null)
@@ -76,7 +84,7 @@ namespace AutoProxy.Services
                         {
                             value += args[i] + " ";
                         }
-                        value.TrimEnd();
+                        value = value.TrimEnd();
                         args = new string[] { args[0], args[1], value };
                     }
 
